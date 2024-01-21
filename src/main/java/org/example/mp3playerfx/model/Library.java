@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 public class Library {
 
-    private List<File> songs;
+    private List <Song> songs;
     private File[] files;
     private String path;
     private File directory;
@@ -24,18 +24,29 @@ public class Library {
 
         if(files!=null) {
             for(File file: files) {
-                songs.add(file);
-                System.out.println(file);
+                if(file.getName().contains(".mp3")|file.getName().contains("wav")) {
+                    songs.add(new Song(file));
+                    System.out.println(file);
+                }
             }
         }
     }
 
-    public File getSongByName(String name) throws FileNotFoundException {
-        for (File song: songs) {
-            if(song.getName().equals(name)) {
+    public Song getSongByName(String name) {
+        for (Song song: songs) {
+            if(song.getFile().getName().equals(name)) {
                 return song;
             }
         }
-        throw new FileNotFoundException();
+        return null;
+    }
+
+    public Song getSongByPath(String path) throws FileNotFoundException {
+        for (Song song: songs) {
+            if(song.getFile().getAbsolutePath().equals(path)) {
+                return song;
+            }
+        }
+        return null;
     }
 }

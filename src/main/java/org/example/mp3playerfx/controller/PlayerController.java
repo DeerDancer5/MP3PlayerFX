@@ -1,24 +1,25 @@
 package org.example.mp3playerfx.controller;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import org.example.mp3playerfx.model.AudioPlayerApplication;
-import java.io.File;
+import org.example.mp3playerfx.SongCellFactory;
+import org.example.mp3playerfx.model.Song;
+
+import java.io.*;
 import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class PlayerController implements Initializable {
 
     private boolean running;
 
-    private String [] speeds = {"2.0","1.5","1.25","1","0.75","0.5","0.25"};
+    private String[] speeds = {"2.0", "1.5", "1.25", "1", "0.75", "0.5", "0.25"};
 
     private Timer timer;
 
@@ -39,27 +40,40 @@ public class PlayerController implements Initializable {
     private ProgressBar progressBar;
 
     @FXML
-    private Button playButton,pauseButton, resetButton,prevButton,nextButton;
+    private Button playButton, pauseButton, resetButton, prevButton, nextButton;
+
+    @FXML
+    ListView libraryView;
+
+    @FXML
+    ListView playlistView;
+
+    @FXML
+    RadioButton nameButton, artistButton, albumButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setButtonsPlaying(false);
+        nameButton.setSelected(true);
         addVolumeListener();
 
-        for(String speed : speeds) {
+        for (String speed : speeds) {
             speedBox.getItems().add(speed);
         }
 
         app = new AudioPlayerApplication(path);
-        songLabel.setText(app.getPlayer().getCurrentSong().getName());
+        loadLibraryView();
+        loadPlaylistView();
+        sortLibrary();
     }
 
     @FXML
     protected void onPlayClick() {
-        beginTimer();
         setButtonsPlaying(true);
-        app.getPlayer().setVolume(volumeSlider.getValue() *0.01);
         app.getPlayer().play();
+        updatePlaylistView();
+        beginTimer();
+        songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
     }
 
     @FXML
@@ -82,13 +96,14 @@ public class PlayerController implements Initializable {
         System.out.println("Previous");
         setButtonsPlaying(true);
         app.getPlayer().previous();
+        updatePlaylistView();
         beginTimer();
 
-        if(running) {
+        if (running) {
             cancelTimer();
         }
 
-        songLabel.setText(app.getPlayer().getCurrentSong().getName());
+        songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
     }
 
     @FXML
@@ -96,13 +111,14 @@ public class PlayerController implements Initializable {
         System.out.println("Next");
         setButtonsPlaying(true);
         app.getPlayer().next();
+        updatePlaylistView();
         beginTimer();
 
-        if(running) {
+        if (running) {
             cancelTimer();
         }
 
-        songLabel.setText(app.getPlayer().getCurrentSong().getName());
+        songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
     }
 
     @FXML
@@ -111,12 +127,12 @@ public class PlayerController implements Initializable {
     }
 
     public void addVolumeListener() {
-       volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-           @Override
-           public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-               app.getPlayer().setVolume(volumeSlider.getValue() *0.01);
-           }
-       });
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                app.getPlayer().setVolume(volumeSlider.getValue() * 0.01);
+            }
+        });
     }
 
     public void beginTimer() {
@@ -127,16 +143,20 @@ public class PlayerController implements Initializable {
                 running = true;
                 double current = app.getPlayer().getCurrentTime();
                 double end = app.getPlayer().getDuration();
-                progressBar.setProgress(current/end);
+                if (running) {
+                    progressBar.setProgress(current / end);
+                }
 
-                if(current/end == 1) {
+                if (current / end == 1) {
                     cancelTimer();
-                    onNextClick();
+                    Platform.runLater(() -> {
+                        onNextClick();
+                    });
                 }
 
             }
         };
-        timer.scheduleAtFixedRate(task,0,1000);
+        timer.scheduleAtFixedRate(task, 0, 1000);
     }
 
     public void cancelTimer() {
@@ -145,44 +165,157 @@ public class PlayerController implements Initializable {
     }
 
     public void setButtonsPlaying(boolean playing) {
-       if(playing) {
-           playButton.setDisable(true);
-           pauseButton.setDisable(false);
-           pauseButton.setVisible(true);
-           playButton.setVisible(false);
-       }
-       else {
-           playButton.setDisable(false);
-           pauseButton.setDisable(true);
-           pauseButton.setVisible(false);
-           playButton.setVisible(true);
-       }
+        if (playing) {
+            playButton.setDisable(true);
+            pauseButton.setDisable(false);
+            pauseButton.setVisible(true);
+            playButton.setVisible(false);
+        } else {
+            playButton.setDisable(false);
+            pauseButton.setDisable(true);
+            pauseButton.setVisible(false);
+            playButton.setVisible(true);
+        }
     }
 
 
     @FXML
-    void handleFileOverEvent(DragEvent event)
-    {
+    void handleFileOverEvent(DragEvent event) {
         Dragboard db = event.getDragboard();
-        if (db.hasFiles())
-        {
+        if (db.hasFiles()) {
             event.acceptTransferModes(TransferMode.COPY);
-        }
-        else
-        {
+        } else {
             event.consume();
         }
     }
 
     @FXML
-    void handleFileDroppedEvent(DragEvent event)
-    {
+    void handleFileDroppedEvent(DragEvent event) {
         Dragboard db = event.getDragboard();
         File file = db.getFiles().get(0);
 
         System.out.printf(file.getAbsolutePath().toString());
-        app.addSongToPlaylist(file);
-        onNextClick();
+        app.addSongToPlaylist(new Song(file));
+        loadPlaylistView();
+        app.switchSong(app.getPlaylist().getSongs().get(app.getPlaylist().getSongs().size() - 1));
+        onResetClick();
+        onPlayClick();
     }
 
+    @FXML
+    void handleDoubleClickPlaylistEvent(MouseEvent event) {
+        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+            app.switchSong((Song) playlistView.getSelectionModel().getSelectedItem());
+            onResetClick();
+            onPlayClick();
+        }
+    }
+
+    @FXML
+    void handleDoubleClickLibraryEvent(MouseEvent event) {
+        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+            System.out.println(libraryView.getSelectionModel().getSelectedItem().toString());
+            app.addSongToPlaylist((Song) libraryView.getSelectionModel().getSelectedItem());
+            loadPlaylistView();
+            app.switchSong(app.getPlaylist().getSongs().get(app.getPlaylist().getSongs().size() - 1));
+            onResetClick();
+            onPlayClick();
+        }
+    }
+
+    @FXML
+    private void sortLibrary() {
+        List<Song> songs = app.getLibrary().getSongs();
+        if (nameButton.isSelected()) {
+            Collections.sort(songs, Comparator.comparing(Song::getTitle));
+        }
+
+        if (artistButton.isSelected()) {
+            Collections.sort(songs, Comparator.comparing(Song::getArtist));
+        }
+
+        if (albumButton.isSelected()) {
+            Collections.sort(songs, Comparator.comparing(Song::getAlbum));
+        }
+        app.getLibrary().setSongs(songs);
+        loadLibraryView();
+    }
+
+    @FXML
+    private void initializeDragAndDrop() {
+        app.updatePlaylist(playlistView.getItems());
+        playlistView.setCellFactory(listView -> {
+            SongCellFactory cellFactory = new SongCellFactory();
+            cellFactory.setOnDragOver(event -> {
+                Dragboard db = event.getDragboard();
+                if (db.hasString()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+
+            cellFactory.setOnDragDropped(event -> {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+
+                if (db.hasString()) {
+                    if (!db.getString().contains("file")) {
+                        int draggedIndex = Integer.parseInt(db.getString());
+                        Song draggedSong = app.getPlaylist().getSongs().remove(draggedIndex);
+                        app.getPlaylist().addSong(draggedSong);
+                        playlistView.getItems().setAll(app.getPlaylist());
+
+
+                        success = true;
+                    }
+
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            });
+
+            return cellFactory;
+        });
+    }
+
+
+    private void loadLibraryView() {
+        List<Song> songs = app.getLibrary().getSongs();
+        libraryView.getItems().clear();
+        libraryView.getItems().addAll(songs);
+        libraryView.setCellFactory(libraryView -> new SongCellFactory());
+
+    }
+
+    private void loadPlaylistView() {
+        playlistView.getItems().clear();
+        playlistView.getSelectionModel().clearSelection();
+        playlistView.getItems().addAll(app.getPlaylist().getSongs());
+        playlistView.setCellFactory(playlistView -> new SongCellFactory());
+    }
+
+
+    public void updatePlaylistView() {
+        Platform.runLater(() -> {
+            playlistView.getSelectionModel().select(app.getPlayer().getSongNum());
+        });
+    }
+
+
+    @FXML
+    public void savePlaylist() throws IOException {
+        List<Song> saved = new ArrayList<>();
+        for (int i = 0; i < playlistView.getItems().size(); i++) {
+            saved.add((Song) playlistView.getItems().get(i));
+        }
+        app.getPlaylist().setSongs(saved);
+        app.savePlaylist();
+    }
+
+    @FXML
+    public void readPlaylist(ActionEvent event) {
+        app.readPlaylist(event);
+        loadPlaylistView();
+
+    }
 }
