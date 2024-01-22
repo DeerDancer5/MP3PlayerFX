@@ -20,4 +20,10 @@ module org.example.mp3playerfx {
     opens org.example.mp3playerfx.model.player to javafx.fxml;
     exports org.example.mp3playerfx.model.playlist;
     opens org.example.mp3playerfx.model.playlist to javafx.fxml;
+    exports org.example.mp3playerfx.model.library;
+    opens org.example.mp3playerfx.model.library to javafx.fxml;
+    exports org.example.mp3playerfx.event;
+    opens org.example.mp3playerfx.event to javafx.fxml;
+    exports org.example.mp3playerfx.model.player.engine;
+    opens org.example.mp3playerfx.model.player.engine to javafx.fxml;
 }

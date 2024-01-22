@@ -3,11 +3,13 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
-import org.example.mp3playerfx.Settings;
+import org.example.mp3playerfx.event.EventDispatcher;
+import org.example.mp3playerfx.event.UpdateLibraryEvent;
 import org.example.mp3playerfx.model.AudioPlayerApplication;
 import org.example.mp3playerfx.SongCellFactory;
 import org.example.mp3playerfx.model.Song;
@@ -65,6 +67,7 @@ public class PlayerController implements Initializable {
         app = new AudioPlayerApplication();
         loadLibraryView();
         loadPlaylistView();
+        addLibraryListener();
         sortLibrary();
     }
 
@@ -134,6 +137,15 @@ public class PlayerController implements Initializable {
                 app.getPlayer().setVolume(volumeSlider.getValue() * 0.01);
             }
         });
+    }
+
+    public void addLibraryListener() {
+        EventHandler<UpdateLibraryEvent> customEventHandler = event -> {
+            loadPlaylistView();
+            loadLibraryView();
+            sortLibrary();
+        };
+        EventDispatcher.setCustomEventHandler(customEventHandler);
     }
 
     public void beginTimer() {
@@ -278,25 +290,27 @@ public class PlayerController implements Initializable {
 
 
     private void loadLibraryView() {
-        List<Song> songs = app.getLibrary().getSongs();
-        libraryView.getItems().clear();
-        libraryView.getItems().addAll(songs);
-        libraryView.setCellFactory(libraryView -> new SongCellFactory());
+        Platform.runLater(()-> {
+            List<Song> songs = app.getLibrary().getSongs();
+            libraryView.getItems().clear();
+            libraryView.getItems().addAll(songs);
+            libraryView.setCellFactory(libraryView -> new SongCellFactory());
+        });
 
     }
 
     private void loadPlaylistView() {
-        playlistView.getItems().clear();
-        playlistView.getSelectionModel().clearSelection();
-        playlistView.getItems().addAll(app.getPlaylist().getSongs());
-        playlistView.setCellFactory(playlistView -> new SongCellFactory());
+        Platform.runLater(()-> {
+            playlistView.getItems().clear();
+            playlistView.getSelectionModel().clearSelection();
+            playlistView.getItems().addAll(app.getPlaylist().getSongs());
+            playlistView.setCellFactory(playlistView -> new SongCellFactory());
+        });
     }
 
 
     public void updatePlaylistView() {
-        Platform.runLater(() -> {
             playlistView.getSelectionModel().select(app.getPlayer().getSongNum());
-        });
     }
 
 

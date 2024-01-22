@@ -6,7 +6,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.mp3playerfx.event.EventDispatcher;
 import org.example.mp3playerfx.Settings;
+import org.example.mp3playerfx.model.library.DirectoryManager;
+import org.example.mp3playerfx.model.library.DirectoryObserver;
+import org.example.mp3playerfx.model.library.Library;
 import org.example.mp3playerfx.model.player.ClipPlayer;
 import org.example.mp3playerfx.model.player.FXPlayer;
 import org.example.mp3playerfx.model.player.Player;
@@ -23,24 +27,27 @@ import java.util.List;
 
 @Getter
 @Setter
-public class AudioPlayerApplication {
+public class AudioPlayerApplication implements DirectoryObserver {
     private Player player;
     private Library library;
     private Playlist playlist;
     private Settings settings;
+    private DirectoryManager directoryManager;
 
     public AudioPlayerApplication() {
         settings = Settings.getSettingsInstance();
         library = new Library(settings.getPath());
         playlist = new JSONPlaylist();
         player = new ClipPlayer(playlist);
+        directoryManager = new DirectoryManager(settings.getPath());
+        directoryManager.addObserver(this);
 
     }
 
     public List <Song> checkPlaylist(List<String> names) {
         List <Song> songs = new ArrayList<>();
         for(String name: names) {
-            Song song = library.getSongByName(name);
+            Song song = library.getSongByFileName(name);
             if(song != null) {
                songs.add(song);
             }
@@ -113,22 +120,37 @@ public class AudioPlayerApplication {
     }
 
     public void updatePlaylist(ObservableList items) {
-
         List <Song> songsUpdated = new ArrayList<>();
         for(int i=0;i<items.size();i++) {
             songsUpdated.add((Song) items.get(i));
         }
+
+        Song current = player.getCurrentSong();
         playlist.setSongs(songsUpdated);
-        player.setSongNum(getSongIndex(player.getCurrentSong()));
         player.setPlaylist(playlist);
+
+        player.setSongNum(getSongIndex(current));
     }
 
     private int getSongIndex(Song song) {
         for(int i=0;i<playlist.getSongs().size();i++) {
-            if(playlist.getSongs().get(i).equals(song)) {
+            if(playlist.getSongs().get(i).getFile().getName().equals(song.getFile().getName())) {
                return i;
             }
         }
         return 0;
+    }
+
+    @Override
+    public void updateFiles() {
+        library = new Library(settings.getPath());
+
+        for(int i=0;i<playlist.getSongs().size();i++) {
+            if(library.getSongByFileName(playlist.getSongs().get(i).getFile().getName())==null) {
+                playlist.getSongs().remove(playlist.getSongs().remove(i));
+            }
+        }
+
+        EventDispatcher.dispatchCustomEvent();
     }
 }
