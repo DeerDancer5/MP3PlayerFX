@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import org.example.mp3playerfx.Settings;
 import org.example.mp3playerfx.model.AudioPlayerApplication;
 import org.example.mp3playerfx.SongCellFactory;
 import org.example.mp3playerfx.model.Song;
@@ -61,7 +62,7 @@ public class PlayerController implements Initializable {
             speedBox.getItems().add(speed);
         }
 
-        app = new AudioPlayerApplication(path);
+        app = new AudioPlayerApplication();
         loadLibraryView();
         loadPlaylistView();
         sortLibrary();
@@ -253,11 +254,9 @@ public class PlayerController implements Initializable {
                 }
                 event.consume();
             });
-
             cellFactory.setOnDragDropped(event -> {
                 Dragboard db = event.getDragboard();
                 boolean success = false;
-
                 if (db.hasString()) {
                     if (!db.getString().contains("file")) {
                         int draggedIndex = Integer.parseInt(db.getString());
@@ -273,7 +272,6 @@ public class PlayerController implements Initializable {
                 event.setDropCompleted(success);
                 event.consume();
             });
-
             return cellFactory;
         });
     }

@@ -41,9 +41,8 @@ public class XMLPlaylistAdapter extends Playlist {
     }
 
     @Override
-    public void saveToFile() {
-        System.out.println("tak");
-       xmlPlaylist.saveToXML();
+    public void saveToFile(String path) {
+       xmlPlaylist.saveToXML(path);
     }
 
     @Override

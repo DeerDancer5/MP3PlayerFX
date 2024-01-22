@@ -30,7 +30,7 @@ public class XMLPlaylist {
        this.songs = new ArrayList<>();
    }
 
-    public void saveToXML() {
+    public void saveToXML(String filePath) {
         System.out.println("tak");
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
@@ -50,7 +50,7 @@ public class XMLPlaylist {
             doc.appendChild(rootElement);
             System.out.println(doc);
             try (FileOutputStream output =
-                         new FileOutputStream("/home/student/Music/playlist.xml")) {
+                         new FileOutputStream(filePath + "playlist.xml")) {
                 writeXml(doc, output);
             } catch (IOException  | TransformerException e) {
                 e.printStackTrace();

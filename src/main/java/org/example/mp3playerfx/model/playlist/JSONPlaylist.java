@@ -34,7 +34,7 @@ public class JSONPlaylist extends Playlist {
     }
 
     @Override
-    public void saveToFile() {
+    public void saveToFile(String path) {
         JSONArray jsonPlaylist = new JSONArray();
         for(Song song : songs) {
             JSONObject jsonSong = new JSONObject();
@@ -44,7 +44,7 @@ public class JSONPlaylist extends Playlist {
 
         FileWriter file;
         try {
-            file = new FileWriter("/home/student/Music/playlist.json");
+            file = new FileWriter(path+"playlist.json");
             file.write(jsonPlaylist.toJSONString());
             file.close();
         } catch (IOException e) {

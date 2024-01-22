@@ -16,7 +16,7 @@ import java.util.List;
 public abstract class Playlist {
 
     public abstract JSONArray readFromFile(File file);
-    public abstract void saveToFile();
+    public abstract void saveToFile(String path);
     public abstract List<Song> getSongs();
     public abstract void setSongs(List <Song> songs);
     abstract void updatePlaylist();

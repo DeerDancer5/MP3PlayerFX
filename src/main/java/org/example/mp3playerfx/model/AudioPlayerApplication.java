@@ -6,6 +6,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.mp3playerfx.Settings;
 import org.example.mp3playerfx.model.player.ClipPlayer;
 import org.example.mp3playerfx.model.player.FXPlayer;
 import org.example.mp3playerfx.model.player.Player;
@@ -19,7 +20,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Collections.replaceAll;
 
 @Getter
 @Setter
@@ -27,9 +27,11 @@ public class AudioPlayerApplication {
     private Player player;
     private Library library;
     private Playlist playlist;
+    private Settings settings;
 
-    public AudioPlayerApplication(String path) {
-        library = new Library(path);
+    public AudioPlayerApplication() {
+        settings = Settings.getSettingsInstance();
+        library = new Library(settings.getPath());
         playlist = new JSONPlaylist();
         player = new ClipPlayer(playlist);
 
@@ -74,7 +76,7 @@ public class AudioPlayerApplication {
     }
 
     public void savePlaylist() {
-       playlist.saveToFile();
+       playlist.saveToFile(settings.getPath());
     }
 
     public void readPlaylist(ActionEvent event) {
@@ -102,7 +104,6 @@ public class AudioPlayerApplication {
             for (Object song : parsedPlaylist) {
                 String name = ((JSONObject) song).get("path").toString();
                 songNames.add(name);
-                System.out.println(name);
             }
 
             playlist.setSongs(checkPlaylist(songNames));
