@@ -1,4 +1,5 @@
 package org.example.mp3playerfx.model.playlist;
+import org.example.mp3playerfx.SongIterator;
 import org.example.mp3playerfx.model.Song;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -65,4 +66,28 @@ public class XMLPlaylistAdapter extends Playlist {
         xmlPlaylist.getSongs().add(song);
     }
 
+    @Override
+    public SongIterator iterator() {
+        return null;
+    }
+
+    @Override
+    public int getCurrentIndex() {
+        return 0;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return false;
+    }
+
+    @Override
+    public Song next() {
+        return null;
+    }
+
+    @Override
+    public Song previous() {
+        return null;
+    }
 }

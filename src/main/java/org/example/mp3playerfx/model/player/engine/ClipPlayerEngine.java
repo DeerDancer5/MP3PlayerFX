@@ -117,8 +117,5 @@ public class ClipPlayerEngine implements PlayerEngine {
         return clip.getMicrosecondLength() * 1000000;
     }
 
-    @Override
-    public void changeState(PlayerEngineState state) {
 
-    }
 }

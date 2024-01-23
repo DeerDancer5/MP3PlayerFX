@@ -1,4 +1,6 @@
 package org.example.mp3playerfx.model.playlist;
+import lombok.Getter;
+import org.example.mp3playerfx.SongIterator;
 import org.example.mp3playerfx.model.Song;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -9,9 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@Getter
 public class JSONPlaylist extends Playlist {
 
     private List<Song> songs;
+    private int currentIndex;
 
     public JSONPlaylist() {
         this.songs = new ArrayList<>();
@@ -73,4 +77,30 @@ public class JSONPlaylist extends Playlist {
     }
 
 
+    @Override
+    public boolean hasNext() {
+        return true;
+    }
+
+    @Override
+    public Song next() {
+        currentIndex = (currentIndex+1)%songs.size();
+        return songs.get(currentIndex);
+    }
+
+    @Override
+    public SongIterator iterator() {
+        return this;
+    }
+
+    @Override
+    public Song previous() {
+        if(currentIndex> 0) {
+            currentIndex--;
+        }
+        else {
+            currentIndex= songs.size()-1;
+        }
+        return songs.get(currentIndex);
+    }
 }

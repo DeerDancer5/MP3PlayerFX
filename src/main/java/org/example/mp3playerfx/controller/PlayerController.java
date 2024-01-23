@@ -13,6 +13,8 @@ import org.example.mp3playerfx.event.UpdateLibraryEvent;
 import org.example.mp3playerfx.model.AudioPlayerApplication;
 import org.example.mp3playerfx.SongCellFactory;
 import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.player.state.EmptyState;
+import org.example.mp3playerfx.model.player.state.PlayingState;
 
 import java.io.*;
 import java.net.URL;
@@ -56,13 +58,8 @@ public class PlayerController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        playButton.setDisable(true);
-        pauseButton.setDisable(true);
-        resetButton.setDisable(true);
-        prevButton.setDisable(true);
-        nextButton.setDisable(true);
-        pauseButton.setVisible(false);
 
+        pauseButton.setVisible(false);
         nameButton.setSelected(true);
         addVolumeListener();
 
@@ -79,11 +76,13 @@ public class PlayerController implements Initializable {
 
     @FXML
     protected void onPlayClick() {
-        setButtonsPlaying(true);
-        app.getPlayer().play();
-        updatePlaylistView();
-        beginTimer();
-        songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
+        app.getPlayer().getPlayerState().pressPlay();
+        if(app.getPlayer().getPlayerState() instanceof PlayingState) {
+            setButtonsPlaying(true);
+            updatePlaylistView();
+            beginTimer();
+            songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
+        }
     }
 
     @FXML
@@ -91,44 +90,46 @@ public class PlayerController implements Initializable {
         cancelTimer();
         setButtonsPlaying(false);
         System.out.println("Pause");
-        app.getPlayer().pause();
+        app.getPlayer().getPlayerState().pressPause();
     }
 
     @FXML
     protected void onResetClick() {
         progressBar.setProgress(0);
         setButtonsPlaying(false);
-        app.getPlayer().stop();
+        app.getPlayer().getPlayerState().pressStop();
     }
 
     @FXML
     protected void onPreviousClick() {
-        System.out.println("Previous");
-        setButtonsPlaying(true);
-        app.getPlayer().previous();
-        updatePlaylistView();
-        beginTimer();
+        if(!(app.getPlayer().getPlayerState() instanceof EmptyState)) {
+            setButtonsPlaying(true);
+            app.getPlayer().getPlayerState().pressPrevious();
+            updatePlaylistView();
+            beginTimer();
 
-        if (running) {
-            cancelTimer();
+            if (running) {
+                cancelTimer();
+            }
+
+            songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
         }
-
-        songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
     }
 
     @FXML
     protected void onNextClick() {
-        System.out.println("Next");
-        setButtonsPlaying(true);
-        app.getPlayer().next();
-        updatePlaylistView();
-        beginTimer();
+        if(!(app.getPlayer().getPlayerState() instanceof EmptyState)) {
+            setButtonsPlaying(true);
+            app.getPlayer().getPlayerState().pressNext();
+            updatePlaylistView();
+            beginTimer();
 
-        if (running) {
-            cancelTimer();
+            if (running) {
+                cancelTimer();
+            }
+
+            songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
         }
-
-        songLabel.setText(app.getPlayer().getCurrentSong().getFile().getName());
     }
 
     @FXML
@@ -179,8 +180,10 @@ public class PlayerController implements Initializable {
     }
 
     public void cancelTimer() {
+        if(running) {
+            timer.cancel();
+        }
         running = false;
-        timer.cancel();
     }
 
     public void setButtonsPlaying(boolean playing) {

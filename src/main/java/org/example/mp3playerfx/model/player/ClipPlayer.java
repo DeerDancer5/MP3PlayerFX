@@ -3,6 +3,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.mp3playerfx.model.player.engine.ClipPlayerEngine;
 import org.example.mp3playerfx.model.player.engine.PlayerEngine;
+import org.example.mp3playerfx.model.player.state.EmptyState;
+import org.example.mp3playerfx.model.player.state.PlayerState;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.Song;
 
@@ -15,6 +17,7 @@ import static javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED;
 @Setter
 public class ClipPlayer implements Player {
     private Playlist playlist;
+    private PlayerState playerState;
     public int songNumber;
     private double speed;
     private double volume;
@@ -22,6 +25,7 @@ public class ClipPlayer implements Player {
 
     public ClipPlayer(Playlist playlist) {
         this.playlist = playlist;
+        this.playerState = new EmptyState(this);
         volume = 0.5;
         speed = 1;
         playerEngine = createEngine();
@@ -117,6 +121,11 @@ public class ClipPlayer implements Player {
         clipPlayerEngine.changeVolume(volume);
         clipPlayerEngine.changeSpeed(speed);
         return clipPlayerEngine;
+    }
+
+    @Override
+    public void changeState(PlayerState playerState) {
+        this.playerState = playerState;
     }
 
 }

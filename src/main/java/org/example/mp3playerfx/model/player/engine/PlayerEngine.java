@@ -18,6 +18,4 @@ public interface PlayerEngine {
     double getCurrentTime();
 
     double getDuration();
-
-    void changeState(PlayerEngineState state);
 }

@@ -1,5 +1,6 @@
 package org.example.mp3playerfx.model.player;
 import org.example.mp3playerfx.model.player.engine.PlayerEngine;
+import org.example.mp3playerfx.model.player.state.PlayerState;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.Song;
 
@@ -30,7 +31,15 @@ public interface Player {
 
     void setSongNum(int num);
 
+    Playlist getPlaylist();
+
+    PlayerEngine getPlayerEngine();
+
     void setPlaylist(Playlist playlist);
 
     PlayerEngine createEngine();
+
+    void changeState(PlayerState playerState);
+
+    PlayerState getPlayerState();
 }
