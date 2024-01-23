@@ -1,6 +1,8 @@
 package org.example.mp3playerfx.model.player;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.mp3playerfx.model.player.engine.ClipPlayerEngine;
+import org.example.mp3playerfx.model.player.engine.PlayerEngine;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.Song;
 
@@ -16,65 +18,32 @@ public class ClipPlayer implements Player {
     public int songNumber;
     private double speed;
     private double volume;
-    private Clip clip;
-    private AudioInputStream stream;
-    AudioFormat format;
-    private long position;
+    private PlayerEngine playerEngine;
 
     public ClipPlayer(Playlist playlist) {
         this.playlist = playlist;
-        position = 0;
         volume = 0.5;
-        stream = null;
+        speed = 1;
+        playerEngine = createEngine();
     }
 
 
     @Override
     public void play() {
-        DataLine.Info info;
-
-        try {
-            stream = AudioSystem.getAudioInputStream(playlist.getSongs().get(songNumber).getFile());
-            format = stream.getFormat();
-            setSpeed(0);
-            info = new DataLine.Info(Clip.class, format);
-            clip = (Clip) AudioSystem.getLine(info);
-            clip.open(stream);
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.out.println("Error while playing");
-            e.printStackTrace();
-        }
-
-        clip.setMicrosecondPosition(position);
-        setVolume(volume);
-        clip.start();
+        Song currentSong = playlist.getSongs().get(songNumber);
+        playerEngine.setCurrentSong(currentSong);
+        playerEngine.play();
 
     }
 
     @Override
     public void pause() {
-        position = clip.getMicrosecondPosition();
-        clip.close();
-        try {
-            stream.close();
-        } catch (IOException e) {
-            System.out.println("Error while pausing");
-            e.printStackTrace();
-        }
+       playerEngine.pause();
     }
 
     @Override
     public void stop() {
-        if(clip!=null) {
-            position = 0;
-            clip.close();
-            try {
-                stream.close();
-            } catch (IOException e) {
-                System.out.println("Error while stopping");
-                e.printStackTrace();
-            }
-        }
+       playerEngine.stop();
     }
 
     @Override
@@ -85,56 +54,41 @@ public class ClipPlayer implements Player {
         else {
             songNumber = playlist.getSongs().size()-1;
         }
-        stop();
-        play();
+        playerEngine.setCurrentSong(playlist.getSongs().get(songNumber));
+        playerEngine.stop();
+        playerEngine.play();
 
     }
 
     @Override
     public void next() {
         songNumber = (songNumber+1)%playlist.getSongs().size();
-        stop();
-        play();
+        playerEngine.setCurrentSong(playlist.getSongs().get(songNumber));
+        playerEngine.stop();
+        playerEngine.play();
     }
 
     @Override
     public void setVolume(double newVolume) {
-        System.out.println(newVolume);
-
-        float calculatedVolume = 20f * (float) Math.log10(newVolume);
-        if(clip!=null) {
-            FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            if (volumeControl != null) {
-                volumeControl.setValue(calculatedVolume);
-            }
-        }
-
+        playerEngine.changeVolume(newVolume);
         volume = newVolume;
     }
 
     @Override
     public void setSpeed(double newSpeed) {
-        AudioFormat inFormat = stream.getFormat();
-        int ch = inFormat.getChannels();
-        float rate = inFormat.getSampleRate();
-        format = new AudioFormat(PCM_SIGNED, 72000, 16, ch, ch * 2, rate/2,
-                inFormat.isBigEndian());
+        playerEngine.changeSpeed(speed);
+        speed = newSpeed;
     }
 
 
     @Override
     public double getCurrentTime() {
-        if(clip!=null) {
-            return clip.getMicrosecondPosition() * 1000000;
-        }
-        else {
-            return position;
-        }
+      return playerEngine.getCurrentTime();
     }
 
     @Override
     public double getDuration() {
-        return clip.getMicrosecondLength() * 1000000;
+        return playerEngine.getDuration();
     }
 
     @Override
@@ -155,6 +109,14 @@ public class ClipPlayer implements Player {
     @Override
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
+    }
+
+    @Override
+    public PlayerEngine createEngine() {
+        ClipPlayerEngine clipPlayerEngine = new ClipPlayerEngine();
+        clipPlayerEngine.changeVolume(volume);
+        clipPlayerEngine.changeSpeed(speed);
+        return clipPlayerEngine;
     }
 
 }

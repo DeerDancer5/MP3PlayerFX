@@ -56,7 +56,13 @@ public class PlayerController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        setButtonsPlaying(false);
+        playButton.setDisable(true);
+        pauseButton.setDisable(true);
+        resetButton.setDisable(true);
+        prevButton.setDisable(true);
+        nextButton.setDisable(true);
+        pauseButton.setVisible(false);
+
         nameButton.setSelected(true);
         addVolumeListener();
 
@@ -231,6 +237,7 @@ public class PlayerController implements Initializable {
             app.addSongToPlaylist((Song) libraryView.getSelectionModel().getSelectedItem());
             loadPlaylistView();
             app.switchSong(app.getPlaylist().getSongs().get(app.getPlaylist().getSongs().size() - 1));
+            updatePlaylistView();
             onResetClick();
             onPlayClick();
         }

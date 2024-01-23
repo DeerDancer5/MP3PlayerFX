@@ -1,59 +1,42 @@
 package org.example.mp3playerfx.model.player;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.mp3playerfx.model.player.engine.FXPLayerEngine;
+import org.example.mp3playerfx.model.player.engine.PlayerEngine;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.Song;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Getter
 @Setter
 public class FXPlayer implements Player {
-    private List <String> extensions;
-    private MediaPlayer mediaPlayer;
+    private PlayerEngine playerEngine;
     private Playlist playlist;
-    private Media media;
     public int songNumber;
     private double speed;
     private double volume;
-    private boolean paused;
 
 
     public FXPlayer(Playlist playlist) {
-        extensions = new ArrayList<>();
-        extensions.add("mp3");
         this.playlist = playlist;
-        songNumber = 0;
         volume = 0.5;
         speed = 1;
-        paused = false;
+        playerEngine = createEngine();
     }
 
     public void play() {
-        if(!paused) {
-            media = new Media(playlist.getSongs().get(songNumber).getFile().toURI().toString());
-            mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setRate(speed);
-            mediaPlayer.setVolume(volume);
-        }
-        mediaPlayer.play();
-        paused = false;
+        Song current = playlist.getSongs().get(songNumber);
+        playerEngine.setCurrentSong(current);
+        playerEngine.play();
     }
 
     public void pause() {
-       mediaPlayer.pause();
-       paused = true;
+        playerEngine.pause();
     }
 
+
     public void stop() {
-        if(mediaPlayer!=null) {
-            mediaPlayer.seek(Duration.seconds(0));
-            mediaPlayer.stop();
-        }
+        playerEngine.stop();
     }
 
     public void previous() {
@@ -63,36 +46,34 @@ public class FXPlayer implements Player {
         else {
             songNumber = playlist.getSongs().size()-1;
         }
-        stop();
-        setMedia(new Media(playlist.getSongs().get(songNumber).getFile().toURI().toString()));
-        setMediaPlayer(new MediaPlayer(media));
-        play();
+        playerEngine.stop();
+        playerEngine.setCurrentSong(playlist.getSongs().get(songNumber));
+        playerEngine.play();
     }
 
     public void next() {
         songNumber = (songNumber+1)%playlist.getSongs().size();
-        stop();
-        setMedia(new Media(playlist.getSongs().get(songNumber).getFile().toURI().toString()));
-        setMediaPlayer(new MediaPlayer(media));
-        play();
+        playerEngine.stop();
+        playerEngine.setCurrentSong(playlist.getSongs().get(songNumber));
+        playerEngine.play();
     }
 
     public void setVolume(double newVolume) {
-        mediaPlayer.setVolume(newVolume);
+        playerEngine.changeVolume(newVolume);
         volume = newVolume;
     }
 
     public void setSpeed(double newSpeed) {
-        mediaPlayer.setRate(newSpeed);
+        playerEngine.changeSpeed(newSpeed);
         speed = newSpeed;
     }
 
     public double getCurrentTime() {
-        return mediaPlayer.getCurrentTime().toSeconds();
+        return playerEngine.getCurrentTime();
     }
 
     public double getDuration() {
-        return media.getDuration().toSeconds();
+        return playerEngine.getDuration();
     }
 
     public Song getCurrentSong() {
@@ -112,6 +93,14 @@ public class FXPlayer implements Player {
     @Override
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
+    }
+
+    @Override
+    public PlayerEngine createEngine() {
+        FXPLayerEngine fxpLayerEngine = new FXPLayerEngine();
+        fxpLayerEngine.changeSpeed(speed);
+        fxpLayerEngine.changeVolume(volume);
+        return fxpLayerEngine;
     }
 
 }

@@ -31,4 +31,6 @@ public interface Player {
     void setSongNum(int num);
 
     void setPlaylist(Playlist playlist);
+
+    PlayerEngine createEngine();
 }
