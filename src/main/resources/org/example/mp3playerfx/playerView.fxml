@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -17,8 +18,18 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane onDragDropped="#handleFileDroppedEvent" onDragOver="#handleFileOverEvent" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.mp3playerfx.controller.PlayerController">
-   <TabPane prefHeight="315.0" prefWidth="552.0" tabClosingPolicy="UNAVAILABLE">
+<StackPane fx:id="root" onDragDropped="#handleFileDroppedEvent" onDragOver="#handleFileOverEvent" prefHeight="330.0" prefWidth="552.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.mp3playerfx.controller.PlayerController">
+   <AnchorPane fx:id="anchorPane" prefHeight="200.0" prefWidth="200.0">
+      <children>
+         <VBox alignment="CENTER" prefHeight="330.0" prefWidth="552.0" style="-fx-spacing: 20;">
+            <children>
+               <Label text="Wybierz folder z muzyką" />
+               <Button fx:id="chooseButton" mnemonicParsing="false" onAction="#changeLibraryPath" text="Wybierz" />
+            </children>
+         </VBox>
+      </children>
+   </AnchorPane>
+   <TabPane fx:id="tabPane" prefHeight="315.0" prefWidth="552.0" tabClosingPolicy="UNAVAILABLE">
      <tabs>
        <Tab text="Player">
          <content>
@@ -28,7 +39,7 @@
                       <padding>
                           <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                       </padding>
-                        <StackPane prefHeight="101.0" prefWidth="512.0" style="-fx-background-color: #0c0c0c;">
+                        <StackPane prefHeight="144.0" prefWidth="512.0" style="-fx-background-color: #0c0c0c;">
                            <children>
                         
                                         <Label fx:id="songLabel" textFill="#f80000">
@@ -38,24 +49,47 @@
                               </Label>
                            </children>
                         </StackPane>
-                     <ProgressBar fx:id="progressBar" prefHeight="28.0" prefWidth="512.0" progress="0.0" />
-                     <HBox alignment="CENTER" prefHeight="34.0" prefWidth="512.0" style="-fx-spacing: 60;">
+                     <ProgressBar fx:id="progressBar" prefHeight="63.0" prefWidth="512.0" progress="0.0" />
+                     <HBox alignment="CENTER" prefHeight="73.0" prefWidth="512.0" style="-fx-spacing: 60;">
                         <children>
-                           <Slider fx:id="volumeSlider" max="100.0" prefHeight="16.0" prefWidth="178.0" value="50.0" />
-                           <ComboBox fx:id="speedBox" onAction="#changeSpeed" prefWidth="150.0" promptText="Speed" />
+                              <VBox alignment="CENTER" prefHeight="40.0" prefWidth="193.0" style="-fx-spacing: 10;">
+                                 <children>
+                                    <Label text="Volume" />
+                                 <Slider fx:id="volumeSlider" max="100.0" prefHeight="16.0" prefWidth="178.0" value="50.0" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" style="-fx-spacing: 10;">
+                                 <children>
+                                    <Label text="Speed" />
+                                 <ComboBox fx:id="speedBox" onAction="#changeSpeed" prefWidth="150.0" promptText="1" />
+                                 </children>
+                              </VBox>
                         </children>
                      </HBox>
-                     <HBox alignment="CENTER" prefHeight="91.0" prefWidth="512.0">
+                     <HBox alignment="CENTER" prefHeight="87.0" prefWidth="512.0">
                         <children>
-                           <Button fx:id="prevButton" onAction="#onPreviousClick" text="&lt;&lt;" textAlignment="CENTER" />
-                           <StackPane prefHeight="66.0" prefWidth="88.0">
-                              <children>
-                                  <Button fx:id="playButton" onAction="#onPlayClick" prefHeight="24.0" prefWidth="90.0" text="Play" textAlignment="CENTER" />
-                                 <Button fx:id="pauseButton" onAction="#onPauseClick" prefHeight="24.0" prefWidth="90.0" text="Pause" textAlignment="CENTER" />
-                              </children>
-                           </StackPane>
-                           <Button fx:id="resetButton" onAction="#onResetClick" prefWidth="91.0" text="Stop" textAlignment="CENTER" />
-                           <Button fx:id="nextButton" onAction="#onNextClick" text="&gt;&gt;" textAlignment="CENTER" />
+                              <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="381.0">
+                                 <children>
+                                 <Button fx:id="prevButton" onAction="#onPreviousClick" text="&lt;&lt;" textAlignment="CENTER" />
+                                 <StackPane prefHeight="66.0" prefWidth="88.0">
+                                    <children>
+                                        <Button fx:id="playButton" onAction="#onPlayClick" prefHeight="24.0" prefWidth="90.0" text="Play" textAlignment="CENTER" />
+                                       <Button fx:id="pauseButton" onAction="#onPauseClick" prefHeight="24.0" prefWidth="90.0" text="Pause" textAlignment="CENTER" />
+                                    </children>
+                                 </StackPane>
+                                 <Button fx:id="resetButton" onAction="#onResetClick" prefWidth="91.0" text="Stop" textAlignment="CENTER" />
+                                 <Button fx:id="nextButton" onAction="#onNextClick" text="&gt;&gt;" textAlignment="CENTER" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="32.0" prefWidth="126.0">
+                                 <children>
+                                    <CheckBox fx:id="shuffleCheckbox" mnemonicParsing="false" onAction="#setShuffle" prefHeight="18.0" prefWidth="75.0" text="Shuffle">
+                                       <font>
+                                          <Font size="11.0" />
+                                       </font>
+                                    </CheckBox>
+                                 </children>
+                              </HBox>
                         </children>
                      </HBox>
                   </VBox>
@@ -67,16 +101,16 @@
          <content>
            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="263.0" prefWidth="552.0">
                   <children>
-                     <VBox prefHeight="285.0" prefWidth="552.0">
+                     <VBox prefHeight="299.0" prefWidth="552.0">
                         <children>
-                           <HBox alignment="CENTER_LEFT" prefHeight="23.0" prefWidth="552.0" style="-fx-spacing: 134; -fx-padding: 1 0 1 10; -fx-background-color: #DCDCDC;">
+                           <HBox alignment="CENTER_LEFT" prefHeight="23.0" prefWidth="552.0" style="-fx-padding: 1 0 1 10; -fx-background-color: #DCDCDC;">
                               <children>
-                                 <Label text="Title         " />
-                                 <Label text="Artist" />
-                                 <Label text="Album" />
+                                 <Label maxWidth="200.0" minWidth="200.0" text="Title         " />
+                                 <Label maxWidth="170.0" minWidth="170.0" text="Artist" />
+                                 <Label maxWidth="150.0" minWidth="150.0" text="Album" />
                               </children>
                            </HBox>
-                           <ListView fx:id="playlistView" focusTraversable="false" onDragExited="#initializeDragAndDrop" onMouseClicked="#handleDoubleClickPlaylistEvent" prefHeight="223.0" prefWidth="552.0" />
+                           <ListView fx:id="playlistView" focusTraversable="false" onDragExited="#initializeDragAndDrop" onMouseClicked="#handleDoubleClickPlaylistEvent" prefHeight="241.0" prefWidth="552.0" />
                            <HBox alignment="CENTER" prefHeight="34.0" prefWidth="552.0" style="-fx-spacing: 20;">
                               <children>
                                  <Button fx:id="readPlaylist" mnemonicParsing="false" onAction="#readPlaylist" text="Load" />
@@ -93,7 +127,7 @@
             <content>
                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="263.0" prefWidth="552.0">
                   <children>
-                     <VBox prefHeight="285.0" prefWidth="552.0">
+                     <VBox alignment="CENTER" prefHeight="299.0" prefWidth="552.0">
                         <children>
                            <HBox alignment="CENTER" prefHeight="46.0" prefWidth="552.0" style="-fx-spacing: 20;">
                               <children>
@@ -106,7 +140,12 @@
                                  <RadioButton fx:id="albumButton" mnemonicParsing="false" onAction="#sortLibrary" text="Album" toggleGroup="$sort" />
                               </children>
                            </HBox>
-                           <ListView fx:id="libraryView" focusTraversable="false" onMouseClicked="#handleDoubleClickLibraryEvent" prefHeight="270.0" prefWidth="552.0" />
+                           <ListView fx:id="libraryView" focusTraversable="false" onMouseClicked="#handleDoubleClickLibraryEvent" prefHeight="263.0" prefWidth="552.0" />
+                           <HBox alignment="CENTER" prefHeight="58.0" prefWidth="552.0">
+                              <children>
+                                 <Button mnemonicParsing="false" onAction="#changeLibraryPath" prefHeight="24.0" prefWidth="134.0" text="Change directory" />
+                              </children>
+                           </HBox>
                         </children>
                      </VBox>
                   </children>

@@ -5,9 +5,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.layout.AnchorPane;
+import org.example.mp3playerfx.Application;
 import org.example.mp3playerfx.event.EventDispatcher;
 import org.example.mp3playerfx.event.UpdateLibraryEvent;
 import org.example.mp3playerfx.model.AudioPlayerApplication;
@@ -33,6 +36,12 @@ public class PlayerController implements Initializable {
     private String path = "/home/student/Music";
 
     @FXML
+    private TabPane tabPane;
+
+    @FXML
+    private AnchorPane anchorPane;
+
+    @FXML
     private Label songLabel;
 
     @FXML
@@ -45,7 +54,7 @@ public class PlayerController implements Initializable {
     private ProgressBar progressBar;
 
     @FXML
-    private Button playButton, pauseButton, resetButton, prevButton, nextButton;
+    private Button playButton, pauseButton, resetButton, prevButton, nextButton,directoryButton,chooseButton;
 
     @FXML
     ListView libraryView;
@@ -56,22 +65,36 @@ public class PlayerController implements Initializable {
     @FXML
     RadioButton nameButton, artistButton, albumButton;
 
+    @FXML
+    CheckBox shuffleCheckbox;
+
+
+    public PlayerController(AudioPlayerApplication app) {
+        this.app = app;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if(app.getLibrary().getSongs()==null) {
+            tabPane.setVisible(false);
 
-        pauseButton.setVisible(false);
-        nameButton.setSelected(true);
-        addVolumeListener();
-
-        for (String speed : speeds) {
-            speedBox.getItems().add(speed);
         }
+        else {
+            tabPane.setVisible(true);
+            anchorPane.setVisible(false);
+            pauseButton.setVisible(false);
+            nameButton.setSelected(true);
+            addVolumeListener();
 
-        app = new AudioPlayerApplication();
-        loadLibraryView();
-        loadPlaylistView();
-        addLibraryListener();
-        sortLibrary();
+            for (String speed : speeds) {
+                speedBox.getItems().add(speed);
+            }
+
+            loadLibraryView();
+            loadPlaylistView();
+            addLibraryListener();
+            sortLibrary();
+        }
     }
 
     @FXML
@@ -339,5 +362,24 @@ public class PlayerController implements Initializable {
         app.readPlaylist(event);
         loadPlaylistView();
 
+    }
+
+    @FXML
+    public void setShuffle() {
+        if(shuffleCheckbox.isSelected()) {
+            app.setShuffle(true);
+        }
+        else {
+            app.setShuffle(false);
+        }
+    }
+
+    @FXML
+    public void changeLibraryPath(ActionEvent event) {
+        app.getPlayer().getPlayerState().pressStop();
+        app.changeLibraryPath(event);
+        tabPane.setVisible(true);
+        anchorPane.setVisible(false);
+        loadLibraryView();
     }
 }

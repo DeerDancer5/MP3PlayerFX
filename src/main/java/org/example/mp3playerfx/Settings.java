@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 @Getter
@@ -34,11 +35,8 @@ public class Settings {
             settingsFile = new File("src/main/resources/settings.txt");
             Scanner scanner = new java.util.Scanner(settingsFile);
             path = scanner.nextLine();
-        } catch (FileNotFoundException e) {
-            path = "/home/student/Music/";
-            saveSettings();
+        } catch (FileNotFoundException | NoSuchElementException e) {
         }
-        System.out.println("path: "+path);
     }
 
     public void saveSettings() {

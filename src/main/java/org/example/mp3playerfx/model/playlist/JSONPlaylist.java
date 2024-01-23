@@ -1,5 +1,6 @@
 package org.example.mp3playerfx.model.playlist;
 import lombok.Getter;
+import lombok.Setter;
 import org.example.mp3playerfx.model.song.SongIterator;
 import org.example.mp3playerfx.model.song.Song;
 import org.json.simple.JSONArray;
@@ -12,6 +13,7 @@ import java.util.List;
 
 
 @Getter
+@Setter
 public class JSONPlaylist extends Playlist {
 
     private List<Song> songs;
@@ -64,11 +66,6 @@ public class JSONPlaylist extends Playlist {
     @Override
     public void setSongs(List<Song> songs) {
         this.songs = songs;
-    }
-
-    @Override
-    public void updatePlaylist() {
-
     }
 
     @Override

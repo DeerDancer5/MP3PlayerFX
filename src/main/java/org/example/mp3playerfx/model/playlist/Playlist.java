@@ -13,7 +13,6 @@ public abstract class Playlist implements SongIterator {
     public abstract void saveToFile(String path);
     public abstract List<Song> getSongs();
     public abstract void setSongs(List <Song> songs);
-    abstract void updatePlaylist();
     public abstract void addSong(Song song);
     public abstract SongIterator iterator();
     public abstract int getCurrentIndex();

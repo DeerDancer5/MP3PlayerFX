@@ -1,6 +1,7 @@
 package org.example.mp3playerfx.model.player;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.mp3playerfx.model.song.ShuffleIterator;
 import org.example.mp3playerfx.model.song.SongIterator;
 import org.example.mp3playerfx.model.player.engine.FXPLayerEngine;
 import org.example.mp3playerfx.model.player.engine.PlayerEngine;
@@ -48,16 +49,16 @@ public class FXPlayer implements Player {
     public void previous() {
 
         playerEngine.stop();
-        playerEngine.setCurrentSong(playlist.previous());
-        songNumber = playlist.getCurrentIndex();
+        playerEngine.setCurrentSong(playlistIterator.previous());
+        songNumber = playlistIterator.getCurrentIndex();
         playerEngine.play();
     }
 
     public void next() {
 
         playerEngine.stop();
-        playerEngine.setCurrentSong(playlist.next());
-        songNumber = playlist.getCurrentIndex();
+        playerEngine.setCurrentSong(playlistIterator.next());
+        songNumber = playlistIterator.getCurrentIndex();
         playerEngine.play();
     }
 
@@ -109,6 +110,16 @@ public class FXPlayer implements Player {
     @Override
     public void changeState(PlayerState playerState) {
         this.playerState = playerState;
+    }
+
+    @Override
+    public void setIterator(SongIterator iterator) {
+        playlistIterator = iterator;
+    }
+
+    @Override
+    public SongIterator getIterator() {
+        return playlistIterator;
     }
 
 }

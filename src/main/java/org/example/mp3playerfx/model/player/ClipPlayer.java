@@ -7,12 +7,14 @@ import org.example.mp3playerfx.model.player.state.EmptyState;
 import org.example.mp3playerfx.model.player.state.PlayerState;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.song.Song;
+import org.example.mp3playerfx.model.song.SongIterator;
 
 @Getter
 @Setter
 public class ClipPlayer implements Player {
     private Playlist playlist;
     private PlayerState playerState;
+    private SongIterator playlistIterator;
     public int songNumber;
     private double speed;
     private double volume;
@@ -21,6 +23,7 @@ public class ClipPlayer implements Player {
     public ClipPlayer(Playlist playlist) {
         this.playlist = playlist;
         this.playerState = new EmptyState(this);
+        this.playlistIterator = playlist.iterator();
         volume = 0.5;
         speed = 1;
         playerEngine = createEngine();
@@ -47,13 +50,8 @@ public class ClipPlayer implements Player {
 
     @Override
     public void previous() {
-        if(songNumber > 0) {
-            songNumber--;
-        }
-        else {
-            songNumber = playlist.getSongs().size()-1;
-        }
-        playerEngine.setCurrentSong(playlist.getSongs().get(songNumber));
+        playerEngine.setCurrentSong(playlistIterator.previous());
+        songNumber = playlistIterator.getCurrentIndex();
         playerEngine.stop();
         playerEngine.play();
 
@@ -61,8 +59,8 @@ public class ClipPlayer implements Player {
 
     @Override
     public void next() {
-        songNumber = (songNumber+1)%playlist.getSongs().size();
-        playerEngine.setCurrentSong(playlist.getSongs().get(songNumber));
+        playerEngine.setCurrentSong(playlistIterator.next());
+        songNumber = playlistIterator.getCurrentIndex();
         playerEngine.stop();
         playerEngine.play();
     }
@@ -121,6 +119,16 @@ public class ClipPlayer implements Player {
     @Override
     public void changeState(PlayerState playerState) {
         this.playerState = playerState;
+    }
+
+    @Override
+    public void setIterator(SongIterator iterator) {
+        playlistIterator = iterator;
+    }
+
+    @Override
+    public SongIterator getIterator() {
+       return playlistIterator;
     }
 
 }

@@ -18,10 +18,11 @@ public class Library {
     private File directory;
 
     public Library(String path) {
-        this.path = path;
-        songs = new ArrayList<>();
-        loadLibrary();
-
+        if(path!=null) {
+            this.path = path;
+            songs = new ArrayList<>();
+            loadLibrary();
+        }
     }
 
     public Song getSongByFileName(String name) {

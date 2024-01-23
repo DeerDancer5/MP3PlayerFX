@@ -3,6 +3,7 @@ import org.example.mp3playerfx.model.player.engine.PlayerEngine;
 import org.example.mp3playerfx.model.player.state.PlayerState;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.song.Song;
+import org.example.mp3playerfx.model.song.SongIterator;
 
 
 public interface Player {
@@ -42,4 +43,7 @@ public interface Player {
     void changeState(PlayerState playerState);
 
     PlayerState getPlayerState();
+
+    void setIterator(SongIterator iterator);
+    SongIterator getIterator();
 }

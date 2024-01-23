@@ -16,6 +16,7 @@ import java.util.List;
 public class XMLPlaylistAdapter extends Playlist {
 
     private XMLPlaylist xmlPlaylist;
+    private int currentIndex;
 
     public XMLPlaylistAdapter(XMLPlaylist xmlPlaylist) {
         this.xmlPlaylist = xmlPlaylist;
@@ -57,11 +58,6 @@ public class XMLPlaylistAdapter extends Playlist {
     }
 
     @Override
-    void updatePlaylist() {
-
-    }
-
-    @Override
     public void addSong(Song song) {
         xmlPlaylist.getSongs().add(song);
     }
@@ -74,6 +70,11 @@ public class XMLPlaylistAdapter extends Playlist {
     @Override
     public int getCurrentIndex() {
         return 0;
+    }
+
+    @Override
+    public void setCurrentIndex(int index) {
+        currentIndex = index;
     }
 
     @Override

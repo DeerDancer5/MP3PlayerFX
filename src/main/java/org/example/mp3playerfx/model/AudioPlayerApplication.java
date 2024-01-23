@@ -2,6 +2,7 @@ package org.example.mp3playerfx.model;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lombok.Getter;
@@ -14,10 +15,12 @@ import org.example.mp3playerfx.model.library.Library;
 import org.example.mp3playerfx.model.player.ClipPlayer;
 import org.example.mp3playerfx.model.player.FXPlayer;
 import org.example.mp3playerfx.model.player.Player;
+import org.example.mp3playerfx.model.player.state.EmptyState;
 import org.example.mp3playerfx.model.playlist.JSONPlaylist;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.playlist.XMLPlaylist;
 import org.example.mp3playerfx.model.playlist.XMLPlaylistAdapter;
+import org.example.mp3playerfx.model.song.ShuffleIterator;
 import org.example.mp3playerfx.model.song.Song;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,13 +38,15 @@ public class AudioPlayerApplication implements DirectoryObserver {
     private Settings settings;
     private DirectoryManager directoryManager;
 
-    public AudioPlayerApplication() {
-        settings = Settings.getSettingsInstance();
-        library = new Library(settings.getPath());
-        playlist = new JSONPlaylist();
-        player = new ClipPlayer(playlist);
-        directoryManager = new DirectoryManager(settings.getPath());
-        directoryManager.addObserver(this);
+    public AudioPlayerApplication(Settings settings, Library library, Playlist playlist, Player player) {
+        this.settings = settings;
+        this.library = new Library(settings.getPath());
+        this.playlist = new JSONPlaylist();
+        this.player = new ClipPlayer(this.playlist);
+        if(library.getSongs()!=null) {
+            directoryManager = new DirectoryManager(settings.getPath());
+            directoryManager.addObserver(this);
+        }
 
     }
 
@@ -58,6 +63,9 @@ public class AudioPlayerApplication implements DirectoryObserver {
 
     public void addSongToPlaylist(Song song) {
        playlist.addSong(song);
+       if(player.getIterator() instanceof ShuffleIterator) {
+           player.setIterator(new ShuffleIterator(player.getPlaylist().getSongs()));
+       }
        checkSongsExtensions();
     }
 
@@ -152,6 +160,37 @@ public class AudioPlayerApplication implements DirectoryObserver {
             }
         }
 
+        if(player.getIterator() instanceof ShuffleIterator) {
+            player.setIterator(new ShuffleIterator(player.getPlaylist().getSongs()));
+        }
         EventDispatcher.dispatchCustomEvent();
     }
+
+    public void setShuffle(boolean checked) {
+        if(checked) {
+            player.setIterator(new ShuffleIterator(player.getPlaylist().getSongs()));
+        }
+        else {
+            player.setIterator(playlist.iterator());
+            player.getIterator().setCurrentIndex(player.getSongNum());
+        }
+    }
+
+    public void changeLibraryPath(ActionEvent event) {
+        Window window = ((Node) (event.getSource())).getScene().getWindow();
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File file = directoryChooser.showDialog(window);
+        event.consume();
+
+        if(file!=null) {
+            settings.setPath(file.getAbsolutePath());
+            settings.saveSettings();
+            library = new Library(settings.getPath());
+            player.changeState(new EmptyState(player));
+            player.getPlaylist().getSongs().clear();
+            directoryManager = new DirectoryManager(settings.getPath());
+            EventDispatcher.dispatchCustomEvent();
+        }
+    }
+
 }
