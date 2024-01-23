@@ -40,9 +40,9 @@ public class AudioPlayerApplication implements DirectoryObserver {
 
     public AudioPlayerApplication(Settings settings, Library library, Playlist playlist, Player player) {
         this.settings = settings;
-        this.library = new Library(settings.getPath());
-        this.playlist = new JSONPlaylist();
-        this.player = new ClipPlayer(this.playlist);
+        this.library = library;
+        this.playlist = playlist;
+        this.player = player;
         if(library.getSongs()!=null) {
             directoryManager = new DirectoryManager(settings.getPath());
             directoryManager.addObserver(this);
