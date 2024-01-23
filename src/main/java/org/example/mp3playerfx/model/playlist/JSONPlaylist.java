@@ -1,7 +1,7 @@
 package org.example.mp3playerfx.model.playlist;
 import lombok.Getter;
-import org.example.mp3playerfx.SongIterator;
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.SongIterator;
+import org.example.mp3playerfx.model.song.Song;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

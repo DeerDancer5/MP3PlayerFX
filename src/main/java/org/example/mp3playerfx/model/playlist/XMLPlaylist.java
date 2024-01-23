@@ -2,7 +2,7 @@ package org.example.mp3playerfx.model.playlist;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.Song;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

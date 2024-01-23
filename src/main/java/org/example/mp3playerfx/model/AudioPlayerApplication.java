@@ -18,6 +18,7 @@ import org.example.mp3playerfx.model.playlist.JSONPlaylist;
 import org.example.mp3playerfx.model.playlist.Playlist;
 import org.example.mp3playerfx.model.playlist.XMLPlaylist;
 import org.example.mp3playerfx.model.playlist.XMLPlaylistAdapter;
+import org.example.mp3playerfx.model.song.Song;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import java.io.*;

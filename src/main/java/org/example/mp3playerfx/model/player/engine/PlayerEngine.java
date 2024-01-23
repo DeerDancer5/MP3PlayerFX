@@ -1,6 +1,6 @@
 package org.example.mp3playerfx.model.player.engine;
 
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.Song;
 
 public interface PlayerEngine {
     void play();

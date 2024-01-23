@@ -1,13 +1,13 @@
 package org.example.mp3playerfx.model.player;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.mp3playerfx.SongIterator;
+import org.example.mp3playerfx.model.song.SongIterator;
 import org.example.mp3playerfx.model.player.engine.FXPLayerEngine;
 import org.example.mp3playerfx.model.player.engine.PlayerEngine;
 import org.example.mp3playerfx.model.player.state.EmptyState;
 import org.example.mp3playerfx.model.player.state.PlayerState;
 import org.example.mp3playerfx.model.playlist.Playlist;
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.Song;
 
 @Getter
 @Setter

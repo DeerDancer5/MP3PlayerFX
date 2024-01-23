@@ -12,7 +12,7 @@ import org.example.mp3playerfx.event.EventDispatcher;
 import org.example.mp3playerfx.event.UpdateLibraryEvent;
 import org.example.mp3playerfx.model.AudioPlayerApplication;
 import org.example.mp3playerfx.SongCellFactory;
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.Song;
 import org.example.mp3playerfx.model.player.state.EmptyState;
 import org.example.mp3playerfx.model.player.state.PlayingState;
 

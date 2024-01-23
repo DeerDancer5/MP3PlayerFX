@@ -1,4 +1,4 @@
-package org.example.mp3playerfx.model;
+package org.example.mp3playerfx.model.song;
 import com.mpatric.mp3agic.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,6 +76,9 @@ public class Song {
     }
 
     private void checkParsedData() {
+        if(title== null) {
+            title = file.getName();
+        }
         if(artist==null) {
             artist = " ";
         }

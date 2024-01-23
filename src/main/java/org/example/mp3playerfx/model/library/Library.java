@@ -1,7 +1,7 @@
 package org.example.mp3playerfx.model.library;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.Song;
 
 import java.io.File;
 import java.io.FileNotFoundException;

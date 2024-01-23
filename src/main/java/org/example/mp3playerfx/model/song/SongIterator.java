@@ -1,5 +1,4 @@
-package org.example.mp3playerfx;
-import org.example.mp3playerfx.model.Song;
+package org.example.mp3playerfx.model.song;
 
 import java.util.Iterator;
 

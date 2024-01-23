@@ -10,7 +10,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import lombok.SneakyThrows;
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.Song;
 
 import java.io.IOException;
 

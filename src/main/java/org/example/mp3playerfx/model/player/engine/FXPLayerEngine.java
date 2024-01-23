@@ -5,7 +5,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.mp3playerfx.model.Song;
+import org.example.mp3playerfx.model.song.Song;
 
 
 @Getter
