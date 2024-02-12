@@ -125,6 +125,7 @@ public class AudioPlayerApplication implements DirectoryObserver {
             playlist.setSongs(checkPlaylist(songNames));
             checkSongsExtensions();
             player.setPlaylist(playlist);
+           player.setIterator(playlist.iterator());
         }
     }
 
@@ -137,7 +138,6 @@ public class AudioPlayerApplication implements DirectoryObserver {
         Song current = player.getCurrentSong();
         playlist.setSongs(songsUpdated);
         player.setPlaylist(playlist);
-
         player.setSongNum(getSongIndex(current));
     }
 

@@ -64,12 +64,12 @@ public class XMLPlaylistAdapter extends Playlist {
 
     @Override
     public SongIterator iterator() {
-        return null;
+        return this;
     }
 
     @Override
     public int getCurrentIndex() {
-        return 0;
+        return currentIndex;
     }
 
     @Override
@@ -79,16 +79,23 @@ public class XMLPlaylistAdapter extends Playlist {
 
     @Override
     public boolean hasNext() {
-        return false;
+        return true;
     }
 
     @Override
     public Song next() {
-        return null;
+        currentIndex = (currentIndex+1)%xmlPlaylist.getSongs().size();
+        return xmlPlaylist.getSongs().get(currentIndex);
     }
 
     @Override
     public Song previous() {
-        return null;
+        if(currentIndex> 0) {
+            currentIndex--;
+        }
+        else {
+            currentIndex= xmlPlaylist.getSongs().size()-1;
+        }
+        return xmlPlaylist.getSongs().get(currentIndex);
     }
 }
